@@ -8,5 +8,5 @@ export default {
     extend: {},
   },
   plugins: [],
-  darkMode: 'class',
+  darkMode: 'class', // Baris ini penting untuk mode gelap
 }
