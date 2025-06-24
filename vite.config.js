@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// Konfigurasi ini tidak memerlukan file postcss.config.js lagi
 export default defineConfig({
   plugins: [react()],
 })
