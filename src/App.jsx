@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// --- Custom Hook untuk Tema (Diperbarui dengan View Transitions API) ---
+// --- Custom Hook untuk Tema ---
 function useDarkMode() {
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -102,7 +102,6 @@ function HighlightSection() {
     const [drag, setDrag] = useState({ start: 0, end: 0, isDragging: false });
     const [isPlaying, setIsPlaying] = useState(true);
     const timeoutRef = useRef(null);
-
     const transitionDuration = 500;
 
     const slideTo = (index) => {
@@ -112,44 +111,27 @@ function HighlightSection() {
 
     useEffect(() => {
         const resetTimeout = () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-
         resetTimeout();
         if (isPlaying && !drag.isDragging) {
             timeoutRef.current = setTimeout(() => slideTo(currentIndex + 1), 3500);
         }
-
         return resetTimeout;
     }, [currentIndex, drag.isDragging, isPlaying]);
 
     const handleTransitionEnd = () => {
         setIsTransitioning(false);
-        if (currentIndex === 0) {
-            setCurrentIndex(slidesData.length - 2);
-        } else if (currentIndex === slidesData.length - 1) {
-            setCurrentIndex(1);
-        }
+        if (currentIndex === 0) setCurrentIndex(slidesData.length - 2);
+        else if (currentIndex === slidesData.length - 1) setCurrentIndex(1);
     };
 
-    const handleTouchStart = (e) => {
-        setDrag({ ...drag, isDragging: true, start: e.touches[0].clientX, end: 0 });
-    };
-
-    const handleTouchMove = (e) => {
-        if (drag.isDragging) {
-            setDrag({ ...drag, end: e.touches[0].clientX });
-        }
-    };
-
+    const handleTouchStart = (e) => setDrag({ ...drag, isDragging: true, start: e.touches[0].clientX, end: 0 });
+    const handleTouchMove = (e) => { if (drag.isDragging) setDrag({ ...drag, end: e.touches[0].clientX }); };
     const handleTouchEnd = () => {
         if (!drag.isDragging) return;
         const dragDistance = drag.start - drag.end;
-        if (Math.abs(dragDistance) > 50) {
-            slideTo(dragDistance > 0 ? currentIndex + 1 : currentIndex - 1);
-        }
+        if (Math.abs(dragDistance) > 50) slideTo(dragDistance > 0 ? currentIndex + 1 : currentIndex - 1);
         setDrag({ start: 0, end: 0, isDragging: false });
     };
     
@@ -162,25 +144,12 @@ function HighlightSection() {
 
     return (
         <section className="w-full select-none py-6">
-            <div className="overflow-hidden"
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-            >
-                <div
-                    className="flex"
-                    style={trackStyle}
-                    onTransitionEnd={handleTransitionEnd}
-                >
+            <div className="overflow-hidden" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+                <div className="flex" style={trackStyle} onTransitionEnd={handleTransitionEnd}>
                     {slidesData.map((item, index) => (
                         <div key={index} className="w-full flex-shrink-0">
                             <a href={item.linkUrl} className="block aspect-video group">
-                                <img 
-                                    src={item.imageUrl} 
-                                    alt={`Iklan ${item.id}`} 
-                                    className="w-full h-full object-cover"
-                                    draggable="false"
-                                />
+                                <img src={item.imageUrl} alt={`Iklan ${item.id}`} className="w-full h-full object-cover" draggable="false" />
                             </a>
                         </div>
                     ))}
@@ -189,19 +158,11 @@ function HighlightSection() {
             <div className="mt-4 flex items-center justify-center space-x-4">
                 <div className="flex space-x-2">
                     {highlightData.map((_, index) => (
-                        <button 
-                            key={index} 
-                            onClick={() => slideTo(index + 1)} 
-                            className={`h-2 rounded-full transition-all duration-300 ${index === displayIndex ? 'w-5 bg-blue-500' : 'w-2 bg-slate-300 dark:bg-slate-600'}`}
-                        ></button>
+                        <button key={index} onClick={() => slideTo(index + 1)} className={`h-2 rounded-full transition-all duration-300 ${index === displayIndex ? 'w-5 bg-blue-500' : 'w-2 bg-slate-300 dark:bg-slate-600'}`}></button>
                     ))}
                 </div>
                 <button onClick={() => setIsPlaying(p => !p)} className="text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white transition-colors">
-                    {isPlaying ? (
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" /></svg>
-                    ) : (
-                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /></svg>
-                    )}
+                    {isPlaying ? <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" /></svg> : <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /></svg>}
                 </button>
             </div>
         </section>
@@ -210,17 +171,10 @@ function HighlightSection() {
 
 // --- Komponen-komponen lainnya ---
 function DetailPage({ post, onBack }) {
-    if (!post) {
-        return <div className="text-center p-10">Postingan tidak ditemukan.</div>;
-    }
+    if (!post) return <div className="text-center p-10">Postingan tidak ditemukan.</div>;
     return (
         <main className="p-4 sm:p-6 flex-grow">
-            <header className="flex items-center mb-4">
-                <button onClick={onBack} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700">
-                    <BackIcon />
-                </button>
-                <h1 className="text-xl font-bold text-gray-800 dark:text-slate-200 ml-2">{post.title}</h1>
-            </header>
+            <header className="flex items-center mb-4"><button onClick={onBack} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700"><BackIcon /></button><h1 className="text-xl font-bold text-gray-800 dark:text-slate-200 ml-2">{post.title}</h1></header>
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 p-4 max-w-md mx-auto">
                 <img src={post.detailImage} alt={post.title} className="w-full h-auto object-cover rounded-lg mb-6" />
                 <h2 className="text-lg font-semibold text-center text-gray-700 dark:text-slate-300 mb-4">Tautan Video</h2>
@@ -236,36 +190,9 @@ function DetailPage({ post, onBack }) {
 function SearchResultsPage({ searchQuery, searchResults, onTitleClick, onBack, onCategoryClick }) {
     return (
         <main className="p-4 sm:p-6 flex-grow">
-            <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center">
-                    <SearchPageIcon />
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">
-                        Hasil untuk: "<span className="text-blue-500">{searchQuery}</span>"
-                    </h2>
-                </div>
-                <button onClick={onBack} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700">
-                    <CloseIcon />
-                </button>
-            </div>
-            {searchResults.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                    {searchResults.map(post => <PostCard key={post.id} post={post} viewMode="grid" onTitleClick={onTitleClick} />)}
-                </div>
-            ) : (
-                <div className="text-center py-10 text-gray-500 dark:text-slate-400">
-                    <p>Tidak ada postingan yang cocok ditemukan.</p>
-                </div>
-            )}
-            <div className="mt-12">
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-slate-300 mb-4">Mungkin Anda suka?</h3>
-                <div className="flex flex-wrap gap-3">
-                    {suggestedCategories.map(cat => (
-                        <button key={cat} onClick={() => onCategoryClick(cat)} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-full hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition-colors">
-                            {cat}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            <div className="flex items-center justify-between mb-5"><div className="flex items-center"><SearchPageIcon /><h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Hasil untuk: "<span className="text-blue-500">{searchQuery}</span>"</h2></div><button onClick={onBack} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700"><CloseIcon /></button></div>
+            {searchResults.length > 0 ? <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">{searchResults.map(post => <PostCard key={post.id} post={post} viewMode="grid" onTitleClick={onTitleClick} />)}</div> : <div className="text-center py-10 text-gray-500 dark:text-slate-400"><p>Tidak ada postingan yang cocok ditemukan.</p></div>}
+            <div className="mt-12"><h3 className="text-lg font-semibold text-gray-700 dark:text-slate-300 mb-4">Mungkin Anda suka?</h3><div className="flex flex-wrap gap-3">{suggestedCategories.map(cat => (<button key={cat} onClick={() => onCategoryClick(cat)} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-slate-300 rounded-full hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition-colors">{cat}</button>))}</div></div>
         </main>
     );
 }
@@ -276,27 +203,18 @@ function PostCard({ post, viewMode, onTitleClick }) {
             <div className="flex items-center space-x-4 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg dark:hover:shadow-slate-700/50 transition-shadow duration-300 p-3 w-full overflow-hidden border border-transparent dark:border-slate-700">
                 <img src={post.imageUrl} alt={post.title} className="w-24 h-24 object-cover rounded-lg flex-shrink-0" />
                 <div className="flex-grow">
-                    <button onClick={() => onTitleClick(post.id)} className="text-left w-full">
-                        <h3 className="font-semibold text-gray-800 dark:text-slate-200 text-lg hover:text-blue-500 dark:hover:text-blue-400 transition-colors">{post.title}</h3>
-                    </button>
+                    <button onClick={() => onTitleClick(post.id)} className="text-left w-full"><h3 className="font-semibold text-gray-800 dark:text-slate-200 text-lg hover:text-blue-500 dark:hover:text-blue-400 transition-colors">{post.title}</h3></button>
                     <p className="text-sm text-gray-500 dark:text-slate-400">{post.category}</p>
                 </div>
             </div>
         );
     }
-    
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg dark:hover:shadow-slate-700/50 transition-shadow duration-300 overflow-hidden group border border-transparent dark:border-slate-700">
-            <div className="overflow-hidden">
-                <img src={post.imageUrl} alt={post.title} className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-300" />
-            </div>
+            <div className="overflow-hidden"><img src={post.imageUrl} alt={post.title} className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-300" /></div>
             <div className="p-4">
-                <button onClick={() => onTitleClick(post.id)} className="text-left w-full">
-                    <h3 className="font-semibold text-gray-800 dark:text-slate-200 text-base truncate hover:text-blue-500 dark:hover:text-blue-400 transition-colors">{post.title}</h3>
-                </button>
-                <div className="flex items-center justify-between mt-2">
-                    <p className="text-sm text-gray-500 dark:text-slate-400 truncate">{post.category}</p>
-                </div>
+                <button onClick={() => onTitleClick(post.id)} className="text-left w-full"><h3 className="font-semibold text-gray-800 dark:text-slate-200 text-base truncate hover:text-blue-500 dark:hover:text-blue-400 transition-colors">{post.title}</h3></button>
+                <div className="flex items-center justify-between mt-2"><p className="text-sm text-gray-500 dark:text-slate-400 truncate">{post.category}</p></div>
             </div>
         </div>
     );
@@ -307,66 +225,23 @@ function Header({ theme, toggleTheme, onSearchSubmit, onSearchClick, onSearchClo
     const themeButtonRef = useRef(null); 
     const [localQuery, setLocalQuery] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (headerRef.current && !headerRef.current.contains(event.target)) {
-                setIsMenuOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-    
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && localQuery.trim() !== '') {
-            onSearchSubmit(localQuery);
-        }
-    };
-    
-    const handleThemeToggleClick = () => {
-        if (!themeButtonRef.current) {
-            toggleTheme();
-            return;
-        }
-
-        const rect = themeButtonRef.current.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-
-        toggleTheme({ clientX: x, clientY: y });
-    };
-
+    useEffect(() => { const handleClickOutside = (event) => { if (headerRef.current && !headerRef.current.contains(event.target)) setIsMenuOpen(false); }; document.addEventListener('mousedown', handleClickOutside); return () => document.removeEventListener('mousedown', handleClickOutside); }, []);
+    const handleKeyDown = (e) => { if (e.key === 'Enter' && localQuery.trim() !== '') onSearchSubmit(localQuery); };
+    const handleThemeToggleClick = () => { if (!themeButtonRef.current) { toggleTheme(); return; } const rect = themeButtonRef.current.getBoundingClientRect(); const x = rect.left + rect.width / 2; const y = rect.top + rect.height / 2; toggleTheme({ clientX: x, clientY: y }); };
     return (
         <div ref={headerRef} className="relative">
             <header className="sticky top-0 z-20 flex items-center justify-between p-3 sm:p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm border-b border-gray-200 dark:border-slate-800">
                 {isSearchOpen ? (
                     <div className="flex items-center w-full">
                         <input type="text" placeholder="Cari postingan..." value={localQuery} onChange={(e) => setLocalQuery(e.target.value)} onKeyDown={handleKeyDown} className="w-full bg-transparent text-gray-800 dark:text-slate-200 placeholder-gray-500 dark:placeholder-slate-400 focus:outline-none text-lg" autoFocus />
-                        <button onClick={onSearchClose} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700">
-                            <CloseIcon />
-                        </button>
+                        <button onClick={onSearchClose} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700"><CloseIcon /></button>
                     </div>
                 ) : (
                     <>
-                        <div className="flex items-center space-x-3">
-                            <button onClick={() => setIsMenuOpen(p => !p)} className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 dark:bg-blue-600 text-white shadow-md hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors" aria-expanded={isMenuOpen}>
-                                {isMenuOpen ? <UpArrowIcon /> : <MenuIcon />}
-                            </button>
-                            <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-200 tracking-tight">Sandex</h1>
-                        </div>
+                        <div className="flex items-center space-x-3"><button onClick={() => setIsMenuOpen(p => !p)} className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 dark:bg-blue-600 text-white shadow-md hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors" aria-expanded={isMenuOpen}>{isMenuOpen ? <UpArrowIcon /> : <MenuIcon />}</button><h1 className="text-2xl font-bold text-gray-800 dark:text-slate-200 tracking-tight">Sandex</h1></div>
                         <div className="flex items-center space-x-1 sm:space-x-2">
-                            <button onClick={onSearchClick} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700">
-                                <SearchIcon />
-                            </button>
-                            <button
-                                ref={themeButtonRef}
-                                onClick={handleThemeToggleClick}
-                                className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
-                                aria-label="Toggle Dark Mode"
-                            >
-                                {theme === 'light' ? <SunIcon /> : <MoonIcon />}
-                            </button>
+                            <button onClick={onSearchClick} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700"><SearchIcon /></button>
+                            <button ref={themeButtonRef} onClick={handleThemeToggleClick} className="p-2 rounded-full text-gray-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Dark Mode">{theme === 'light' ? <SunIcon /> : <MoonIcon />}</button>
                         </div>
                     </>
                 )}
@@ -389,34 +264,21 @@ function Footer() {
         <footer className="bg-slate-800 dark:bg-black text-slate-400 mt-auto">
             <div className="max-w-6xl mx-auto py-10 px-4 sm:px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-slate-300 mb-4">SUPPORT</h3>
-                        <a href="#" className="block text-lg hover:text-white transition-colors">Saweria</a>
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-bold tracking-wider uppercase text-slate-300 mb-4">ABOUT</h3>
-                        <a href="#" className="block text-lg hover:text-white transition-colors">About Us</a>
-                    </div>
+                    <div><h3 className="text-sm font-bold tracking-wider uppercase text-slate-300 mb-4">SUPPORT</h3><a href="#" className="block text-lg hover:text-white transition-colors">Saweria</a></div>
+                    <div><h3 className="text-sm font-bold tracking-wider uppercase text-slate-300 mb-4">ABOUT</h3><a href="#" className="block text-lg hover:text-white transition-colors">About Us</a></div>
                 </div>
-                <div className="mt-8 pt-8 border-t border-slate-700 dark:border-slate-600 text-center text-slate-500">
-                    <p>&copy; {new Date().getFullYear()} Sandex. All rights reserved.</p>
-                </div>
+                <div className="mt-8 pt-8 border-t border-slate-700 dark:border-slate-600 text-center text-slate-500"><p>&copy; {new Date().getFullYear()} Sandex. All rights reserved.</p></div>
             </div>
         </footer>
     );
 }
 
 function ChatButton() {
-    return (
-        <a href="https://t.me/SandexReal" target="_blank" rel="noopener noreferrer" className="fixed bottom-6 right-6 z-30 h-16 w-16 flex items-center justify-center bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all transform hover:scale-110" aria-label="Chat di Telegram">
-            <TelegramIcon />
-        </a>
-    );
+    return (<a href="https://t.me/SandexReal" target="_blank" rel="noopener noreferrer" className="fixed bottom-6 right-6 z-30 h-16 w-16 flex items-center justify-center bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all transform hover:scale-110" aria-label="Chat di Telegram"><TelegramIcon /></a>);
 }
 
 export default function App() {
     const [theme, toggleTheme] = useDarkMode(); 
-    
     const [viewMode, setViewMode] = useState('grid');
     const [currentPage, setCurrentPage] = useState('home'); 
     const [selectedPostId, setSelectedPostId] = useState(null);
@@ -426,35 +288,13 @@ export default function App() {
     const handleSelectPost = (id) => { setCurrentPage('detail'); setSelectedPostId(id); setIsSearchOpen(false); window.scrollTo(0, 0); };
     const handleGoHome = () => { setCurrentPage('home'); setSelectedPostId(null); setSearchQuery(''); setIsSearchOpen(false); };
     const handleSearchSubmit = (query) => { setSearchQuery(query); setCurrentPage('search-results'); setIsSearchOpen(false); };
-    const handleCategoryClick = (category) => { handleSearchSubmit(category); };
+    const handleCategoryClick = (category) => handleSearchSubmit(category);
     
     let pageContent;
     switch (currentPage) {
-        case 'detail':
-            pageContent = <DetailPage post={postsData.find(p => p.id === selectedPostId)} onBack={handleGoHome} />;
-            break;
-        case 'search-results':
-            const searchResults = postsData.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase()));
-            pageContent = <SearchResultsPage searchQuery={searchQuery} searchResults={searchResults} onTitleClick={handleSelectPost} onBack={handleGoHome} onCategoryClick={handleCategoryClick} />;
-            break;
-        default:
-            pageContent = (
-                <>
-                    <HighlightSection />
-                    <main className="p-4 sm:p-6 flex-grow">
-                        <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Postingan Terbaru</h2>
-                            <div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-slate-800 rounded-lg">
-                                <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 text-blue-600' : 'text-gray-500'}`}><GridIcon /></button>
-                                <button onClick={() => setViewMode('list')} className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600' : 'text-gray-500'}`}><ListIcon /></button>
-                            </div>
-                        </div>
-                        <div className={`transition-all duration-300 ${viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5' : 'flex flex-col space-y-4'}`}>
-                            {postsData.map(post => <PostCard key={post.id} post={post} viewMode={viewMode} onTitleClick={handleSelectPost} />)}
-                        </div>
-                    </main>
-                </>
-            );
+        case 'detail': pageContent = <DetailPage post={postsData.find(p => p.id === selectedPostId)} onBack={handleGoHome} />; break;
+        case 'search-results': const searchResults = postsData.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase())); pageContent = <SearchResultsPage searchQuery={searchQuery} searchResults={searchResults} onTitleClick={handleSelectPost} onBack={handleGoHome} onCategoryClick={handleCategoryClick} />; break;
+        default: pageContent = (<><HighlightSection /><main className="p-4 sm:p-6 flex-grow"><div className="flex items-center justify-between mb-5"><h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Postingan Terbaru</h2><div className="flex items-center space-x-2 p-1 bg-gray-200 dark:bg-slate-800 rounded-lg"><button onClick={() => setViewMode('grid')} className={`p-2 rounded-md ${viewMode === 'grid' ? 'bg-white dark:bg-slate-700 text-blue-600' : 'text-gray-500'}`}><GridIcon /></button><button onClick={() => setViewMode('list')} className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600' : 'text-gray-500'}`}><ListIcon /></button></div></div><div className={`transition-all duration-300 ${viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5' : 'flex flex-col space-y-4'}`}>{postsData.map(post => <PostCard key={post.id} post={post} viewMode={viewMode} onTitleClick={handleSelectPost} />)}</div></main></>);
     }
 
     return (
@@ -465,33 +305,16 @@ export default function App() {
                   animation: none;
                   mix-blend-mode: normal;
                 }
-                .dark::view-transition-old(root) {
-                  z-index: 1;
-                }
-                .dark::view-transition-new(root) {
-                  z-index: 999;
-                }
-                ::view-transition-old(root) {
-                  z-index: 999;
-                }
-                ::view-transition-new(root) {
-                  z-index: 1;
-                }
+                .dark::view-transition-old(root) { z-index: 1; }
+                .dark::view-transition-new(root) { z-index: 999; }
+                ::view-transition-old(root) { z-index: 999; }
+                ::view-transition-new(root) { z-index: 1; }
             `}</style>
             
             <div className="bg-slate-100 dark:bg-slate-950 font-sans">
                 <div className="max-w-6xl mx-auto min-h-screen flex flex-col">
-                    <Header 
-                        theme={theme} 
-                        toggleTheme={toggleTheme} 
-                        onSearchClick={() => setIsSearchOpen(true)} 
-                        onSearchClose={() => setIsSearchOpen(false)} 
-                        isSearchOpen={isSearchOpen} 
-                        onSearchSubmit={handleSearchSubmit} 
-                    />
-                    <div className="flex-grow">
-                        {pageContent}
-                    </div>
+                    <Header theme={theme} toggleTheme={toggleTheme} onSearchClick={() => setIsSearchOpen(true)} onSearchClose={() => setIsSearchOpen(false)} isSearchOpen={isSearchOpen} onSearchSubmit={handleSearchSubmit} />
+                    <div className="flex-grow">{pageContent}</div>
                     <Footer />
                 </div>
                 <ChatButton />
