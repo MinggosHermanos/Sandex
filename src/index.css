@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Kode tes untuk memaksa Tailwind */
+body {
+    @apply bg-red-500;
+}
