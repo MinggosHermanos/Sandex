@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// --- Custom Hook untuk Tema ---
+// --- Custom Hook untuk Tema (Diperbarui dengan View Transitions API) ---
 function useDarkMode() {
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
